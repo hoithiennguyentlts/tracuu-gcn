@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// Đã thay đổi: Import collection và addDoc thay vì doc và setDoc
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// --- DÁN MÃ CONFIG CỦA BẠN VÀO ĐÂY GIỐNG NHƯ BÊN APP.JS ---
 const firebaseConfig = {
     apiKey: "AIzaSyDOmL3VtekDeE5updKHnQWuGT5QTLG1a6k",
     authDomain: "tracuugcn-htn.firebaseapp.com",
@@ -11,8 +11,7 @@ const firebaseConfig = {
     messagingSenderId: "741478999735",
     appId: "1:741478999735:web:278ea21fb7aad943a74f32",
     measurementId: "G-QXRX5N85JC"
-  };
-// ----------------------------------------------------------
+};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -42,7 +41,7 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 document.getElementById('uploadBtn').addEventListener('click', async () => {
     const phone = document.getElementById('upPhone').value.trim();
-    const fileUrl = document.getElementById('upFileUrl').value.trim(); // Lấy trực tiếp link ảnh
+    const fileUrl = document.getElementById('upFileUrl').value.trim(); 
     
     if (!phone || !fileUrl) {
         alert("Vui lòng nhập Số điện thoại và Link ảnh!"); return;
@@ -53,6 +52,7 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 
     try {
         const docData = {
+            phone: phone, // Đã thêm: Lưu số điện thoại làm 1 trường dữ liệu
             hoTen: document.getElementById('upName').value.trim(),
             maHoiVien: document.getElementById('upId').value.trim(),
             noiDung: document.getElementById('upContent').value.trim(),
@@ -60,11 +60,11 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
             soQD: document.getElementById('upDecisionNo').value.trim(),
             ngayCap: document.getElementById('upDate').value.trim(),
             nguoiKy: document.getElementById('upSigner').value.trim(),
-            fileUrl: fileUrl // Lưu thẳng link đã nhập vào database
+            fileUrl: fileUrl 
         };
 
-        // Lưu vào Firestore
-        await setDoc(doc(db, "certificates", phone), docData);
+        // Đã thay đổi: Dùng addDoc để lưu vào collection "certificates" (tự tạo ID riêng cho mỗi GCN)
+        await addDoc(collection(db, "certificates"), docData);
 
         alert("Tải lên thành công!");
         document.querySelectorAll('#uploadSection input').forEach(input => input.value = '');

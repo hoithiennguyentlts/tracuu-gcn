@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// Đã thay đổi: Import thư viện hỗ trợ truy vấn (query, where, getDocs)
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// --- DÁN MÃ CONFIG CỦA BẠN VÀO ĐÂY ---
 const firebaseConfig = {
     apiKey: "AIzaSyDOmL3VtekDeE5updKHnQWuGT5QTLG1a6k",
     authDomain: "tracuugcn-htn.firebaseapp.com",
@@ -10,8 +10,7 @@ const firebaseConfig = {
     messagingSenderId: "741478999735",
     appId: "1:741478999735:web:278ea21fb7aad943a74f32",
     measurementId: "G-QXRX5N85JC"
-  };
-// -------------------------------------
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -23,30 +22,47 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
     const btn = document.getElementById('searchBtn');
     btn.innerText = "Đang tìm..."; btn.disabled = true;
 
+    const resultsContainer = document.getElementById('resultsContainer');
+    const instructionBox = document.getElementById('instructionBox');
+    
+    // Xóa sạch kết quả của lần tìm kiếm trước đó
+    resultsContainer.innerHTML = '';
+
     try {
-        const docRef = doc(db, "certificates", phone);
-        const docSnap = await getDoc(docRef);
+        // Đã thay đổi: Tạo câu truy vấn tìm tất cả GCN có trường 'phone' bằng với số đã nhập
+        const q = query(collection(db, "certificates"), where("phone", "==", phone));
+        const querySnapshot = await getDocs(q);
 
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('instructionBox').style.display = 'none';
-            document.getElementById('resultCard').style.display = 'flex';
+        if (!querySnapshot.empty) {
+            // Nếu có kết quả, ẩn hộp hướng dẫn đi
+            instructionBox.style.display = 'none';
 
-            document.getElementById('resPhone').innerText = phone;
-            document.getElementById('resName').innerText = data.hoTen;
-            document.getElementById('resId').innerText = data.maHoiVien;
-            document.getElementById('resContent').innerText = data.noiDung;
-            document.getElementById('resBookNo').innerText = data.soSo;
-            document.getElementById('resDecisionNo').innerText = data.soQD;
-            document.getElementById('resDate').innerText = data.ngayCap;
-            document.getElementById('resSigner').innerText = data.nguoiKy;
-            
-            document.getElementById('certImg').src = data.fileUrl;
-            document.getElementById('downloadLink').href = data.fileUrl;
+            // Chạy vòng lặp qua từng giấy chứng nhận tìm được
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                
+                // Tạo mã HTML cho từng thẻ GCN
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <img src="${data.fileUrl}" alt="Giấy chứng nhận" class="cert-image">
+                    <div class="info-group"><strong>ID (Số ĐT):</strong> <span>${data.phone || phone}</span></div>
+                    <div class="info-group"><strong>Họ và tên:</strong> <span>${data.hoTen || ''}</span></div>
+                    <div class="info-group"><strong>Mã hội viên:</strong> <span>${data.maHoiVien || ''}</span></div>
+                    <div class="info-group"><strong>Nội dung:</strong> <span>${data.noiDung || ''}</span></div>
+                    <div class="info-group"><strong>Số sổ:</strong> <span>${data.soSo || ''}</span></div>
+                    <div class="info-group"><strong>Số Quyết định:</strong> <span>${data.soQD || ''}</span></div>
+                    <div class="info-group"><strong>Ngày cấp:</strong> <span>${data.ngayCap || ''}</span></div>
+                    <div class="info-group"><strong>Người ký:</strong> <span>${data.nguoiKy || ''}</span></div>
+                    <a href="${data.fileUrl}" class="download-btn" target="_blank" download>Tải về Giấy chứng nhận</a>
+                `;
+                // Đưa thẻ vừa tạo vào vùng chứa
+                resultsContainer.appendChild(card);
+            });
         } else {
+            // Nếu không có kết quả
             alert("Không tìm thấy dữ liệu cho số điện thoại này!");
-            document.getElementById('resultCard').style.display = 'none';
-            document.getElementById('instructionBox').style.display = 'block';
+            instructionBox.style.display = 'block';
         }
     } catch (error) {
         console.error(error);

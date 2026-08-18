@@ -8,7 +8,7 @@
         body {
             margin: 0; padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('background-HTN.png'); /* Đảm bảo có ảnh này chung thư mục */
+            background-image: url('background-HTN.png'); 
             background-size: cover; background-position: center; background-attachment: fixed;
             min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: #333;
         }
@@ -18,12 +18,18 @@
         .search-btn { padding: 12px 25px; border-radius: 25px; border: none; background-color: #ff8c00; color: white; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.3s; }
         .search-btn:hover { background-color: #e67e22; }
         .instruction-box { background-color: rgba(24, 119, 242, 0.9); color: white; padding: 20px 30px; border-radius: 15px; width: 80%; max-width: 800px; text-align: center; line-height: 1.6; }
-        .result-card { display: none; flex-direction: column; background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 450px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-top: 20px; margin-bottom: 50px; }
+        
+        /* Đã sửa css phần này: Bỏ display: none; để các thẻ sinh ra tự động hiển thị */
+        .result-card { display: flex; flex-direction: column; background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 450px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-top: 20px; margin-bottom: 20px; }
+        
         .cert-image { width: 100%; border-radius: 10px; margin-bottom: 15px; border: 1px solid #eee; }
         .info-group { margin-bottom: 8px; font-size: 15px; }
         .info-group strong { color: #0056b3; }
         .download-btn { margin-top: 15px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; }
         .download-btn:hover { background-color: #218838; }
+        
+        /* Cấu hình cho vùng chứa nhiều GCN */
+        #resultsContainer { width: 100%; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
     </style>
 </head>
 <body>
@@ -39,18 +45,7 @@
         <p>Nhập <strong>Số điện thoại</strong> để xem và tải Giấy chứng nhận. Nếu không thấy dữ liệu, vui lòng liên hệ Ban Điều hành Hội (Võ Minh Quý - 0337823646) để được hỗ trợ.</p>
     </div>
 
-    <div class="result-card" id="resultCard">
-        <img src="" alt="Giấy chứng nhận" id="certImg" class="cert-image">
-        <div class="info-group"><strong>ID (Số ĐT):</strong> <span id="resPhone"></span></div>
-        <div class="info-group"><strong>Họ và tên:</strong> <span id="resName"></span></div>
-        <div class="info-group"><strong>Mã hội viên:</strong> <span id="resId"></span></div>
-        <div class="info-group"><strong>Nội dung:</strong> <span id="resContent"></span></div>
-        <div class="info-group"><strong>Số sổ:</strong> <span id="resBookNo"></span></div>
-        <div class="info-group"><strong>Số Quyết định:</strong> <span id="resDecisionNo"></span></div>
-        <div class="info-group"><strong>Ngày cấp:</strong> <span id="resDate"></span></div>
-        <div class="info-group"><strong>Người ký:</strong> <span id="resSigner"></span></div>
-        <a href="#" id="downloadLink" class="download-btn" target="_blank" download>Tải về Giấy chứng nhận</a>
-    </div>
+    <div id="resultsContainer"></div>
 
     <script type="module" src="app.js"></script>
 </body>
